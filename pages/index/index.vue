@@ -1,7 +1,6 @@
 <template>
 	<view class="content">
 		<nav-top title="网易云音乐" :show="false" color="#000"></nav-top>
-		
 		<view class="container">
 			<scroll-view scroll-y="true" >
 				<!-- 搜索框 -->

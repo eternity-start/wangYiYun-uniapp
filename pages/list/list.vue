@@ -10,27 +10,26 @@
 					
 					<view class="detail-left">
 						<image :src="playList.coverImgUrl" mode=""></image>
-						<text>30000</text>
+						<text>{{playList.playCount | handleNumber}}</text>
 					</view>
 					<view class="detail-right">
 						<view class="r-top">
-							云音乐飙升榜
+							{{playList.name}}
 						</view>
 						<view class="r-center">
-							<image src="../../static/wangyiyunyinyue.png" mode=""></image>
-							<text>网易云音乐</text>
+							<image :src="playList.creator.avatarUrl" mode=""></image>
+							<text>{{playList.creator.nickname}}</text>
 						</view>
 						<view class="r-bottom">
-							<text>云音乐中每天热度上升最快的100</text>
-							<text class="iconfont icon-zuojiantou"></text>
+							<text class="iconfont icon-zuojiantou">{{playList.description}}</text>
 						</view>
 					</view>
 				</view>
 				<!-- 分享 -->
-				<view class="share">
+				<button class="share" open-type="share">
 					<text class="iconfont icon-fenxiang"></text>
-					<text>分享给微信好友</text>
-				</view>
+					分享给微信好友
+				</button>
 				<!-- 歌单列表 -->
 				<view class="music-list">
 					<view class="list-top">
@@ -78,7 +77,10 @@
 				playList: {
 					coverImgUrl: '',
 					description: '',
-					tracks: []
+					tracks: [],
+					creator: {
+						avatarUrl: ''
+					}
 				},
 				privileges: []
 			}
@@ -89,6 +91,7 @@
 			this.getDetailLists()
 		},
 		methods: {
+			// 请求歌单列表
 			getDetailLists() {
 				let _data = {
 					id: this.id
@@ -100,6 +103,13 @@
 					this.privileges = res.privileges
 					this.isshow = true
 					console.log(this.playList)
+				})
+			},
+			// 点击歌单进入歌曲
+			gotoMusicDetail(e) {
+				console.log(e)
+				uni.navigateTo({
+					url: '../detail/detail?id='+e
 				})
 			}
 		}
@@ -146,21 +156,27 @@
 			}
 		}
 		.r-bottom{
-			
+			width: 420rpx;
+			text{
+				overflow:hidden; 
+				text-overflow:ellipsis;
+				display:-webkit-box; 
+				-webkit-box-orient:vertical;
+				-webkit-line-clamp:2; 
+			}
 		}
 	}
 }
 .share{
+	display: flex;
 	text-align: center;
 	line-height: 76rpx;
 	margin: 0 210rpx 40rpx 210rpx;
 	height: 76rpx;
 	border-radius: 40rpx;
 	background: rgba(0,0,0,0.4);
-	text{
-		font-size: 36rpx;
-		color: #fff;
-	}
+	color: #fff;
+	font-size: 36rpx;
 }
 .music-list{
 	background-color: #fff;
