@@ -102,6 +102,10 @@
 					this.playList = res.playlist
 					this.privileges = res.privileges
 					this.isshow = true
+					
+					console.log('我的世界')
+					console.log(res)
+					this.$store.commit('INIT_TOPLISTIDS', res.playlist.trackIds)
 					console.log(this.playList)
 				})
 			},

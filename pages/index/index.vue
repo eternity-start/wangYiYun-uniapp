@@ -4,7 +4,7 @@
 		<view class="container">
 			<scroll-view scroll-y="true" >
 				<!-- 搜索框 -->
-				<view class="search">
+				<view class="search" @click="gotoSearch">
 					<text  class="iconfont icon-fangdajing text1"></text>
 					<text>搜索歌曲</text>
 				</view>
@@ -64,6 +64,12 @@
 				console.log(e)
 				uni.navigateTo({
 					url: '../list/list?id=' + e
+				})
+			},
+			// 搜索页面
+			gotoSearch() {
+				uni.navigateTo({
+					url: '../search/search'
 				})
 			}
 		}
