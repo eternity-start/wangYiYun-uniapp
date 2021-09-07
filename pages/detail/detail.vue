@@ -13,11 +13,13 @@
 					<view class=""></view>
 				</view>
 				<!-- 歌词 -->
-				<view class="music-word">
-					<view class="">我的世界</view>
-					<view class="">我的世界</view>
-					<view class="">我的世界</view>
+				<view class="lyricroll">
+					<view class="music-word" :style="{transform: 'translateY('+ -(activeWord-1)*88+'rpx)'}">
+						<view class="word-item" :class="{'activeword': activeWord==index}"   v-for="(item, index) in lyricList" :key="index">{{item.lyric}}</view>
+						<!-- <view class="">我的世界</view> -->
+					</view>
 				</view>
+				
 				<!-- share -->
 				<view class="top-btn">
 					<button size="mini" open-type="share">分享给微信好友</button>
@@ -25,7 +27,7 @@
 				<!-- 推荐歌曲 -->
 				<view class="simile-music">
 					<view class="simile-person">喜欢这首歌的人也喜欢</view>
-					<view class="music-item" v-for="(item, index) in simiSongs" :key="item.id">
+					<view class="music-item" v-for="(item, index) in simiSongs" :key="item.id" @click="gotoRecommend(item.id)">
 						<image :src="item.album.blurPicUrl" mode=""></image>
 						<view class="music-name">
 							<text>{{item.album.name}}</text>
@@ -53,7 +55,7 @@
 								<view class="c-r-l-l-time">{{item.time | handleTime}}</view>
 							</view>
 							<view class="comment-r-t-right">
-								<text>{{item.likedCount}}</text>
+								<text>{{item.likedCount | handleNumber}}</text>
 								<text class="iconfont icon-dianzan"></text>
 							</view>
 						</view>
@@ -85,16 +87,27 @@
 				// icon
 				iconPlay: '',
 				simiSongs: [],
-				hotComment: []
+				hotComment: [],
+				lrc:{},
+				lyricList: [],
+				activeWord: 0,
+				timer: null
 			}
 		},
 		onLoad(e) {
-			console.log(e)
+			// console.log(e)
 			this.ids = e.id
 			this.getsongDetail()
 			this.getsongUrl()
 			this.getsimiSong()
 			this.getcommentMusic()
+			this.getlyric()
+		},
+		onHide() {
+			this.cancelInterval()
+		},
+		onUnload() {
+			this.cancelInterval()
 		},
 		methods: {
 			// 歌曲信息
@@ -102,9 +115,12 @@
 				let _data = {
 					ids: this.ids
 				}
+				this.$store.commit('NEXT_ID', this.ids)
 				this.$api.songDetail(_data).then( res => {
 					this.songs = res.songs
 					this.privileges = res.privileges
+					// console.log(res)
+					
 					this.isshow = true
 				})
 			},
@@ -123,7 +139,6 @@
 					id: this.ids
 				}
 				this.$api.commentMusic(_data).then( res => {
-					console.log(res)
 					this.hotComment = res.hotComments
 				})
 			},
@@ -145,20 +160,74 @@
 					this.bgAudioManager = uni.getBackgroundAudioManager()
 					this.bgAudioManager.title = this.songs[0].name
 					this.bgAudioManager.src = res.data[0].url
-					
+					// 歌词计时
+					// this.lyricIndex()
 					// 播放回调事件
 					this.bgAudioManager.onPlay(()=>{
 						// 旋转
 						this.suspends = false
 						// icon
 						this.iconPlay = 'icon-zanting'
+						// this.lyricIndex()
 					})
 					// 暂停回调
 					this.bgAudioManager.onPause(()=>{
 						this.suspends = true
 						this.iconPlay = 'icon-bofang1'
+						this.cancelInterval()
 					})
+					// 播放完成
+					this.bgAudioManager.onEnded(() => {
+						(this.$store.state.nextId)
+					}) 
 				})
+			},
+			// 获取歌词
+			getlyric() {
+				let _data = {
+					id: this.ids
+				}
+				this.$api.lyric(_data).then( res => {
+					if(res.code == '200') {
+						let lyric = res.lrc.lyric
+						let result = []
+						let re = /\[([^\]]+)\]([^\[]+)/g
+						lyric.replace(re, ($1, $2, $3) => {
+							result.push({"time": this.handleSecond($2), "lyric": $3})
+						})
+						// console.log(result)
+						this.lyricList = result
+					}
+				})
+			},
+			// 歌词时间过滤器
+			handleSecond(value) {
+				let arrValue = value.split(':')
+				let result = (Number(arrValue[0])*60+Number(arrValue[1])).toFixed(2)
+				return result
+			},
+			// 推荐歌曲跳转
+			gotoRecommend(id) {
+				this.ids = id+''
+			},
+			// 歌词滚动计时器
+			lyricIndex() {
+				clearInterval(this.timer)
+				this.timer = setInterval(() => {
+					for(let i=0; i<this.lyricList.length;i++) {
+						if(this.bgAudioManager.currentTime>=this.lyricList[this.lyricList.length-1].time) {
+							this.activeWord = this.lyricList.length-1
+							break;
+						}
+						if(this.bgAudioManager.currentTime>=this.lyricList[i].time && this.bgAudioManager.currentTime<this.lyricList[i+1].time) {
+							this.activeWord = i
+							// console.log(this.activeWord)
+						}
+					}
+				}, 10)
+			},
+			cancelInterval() {
+				clearInterval(this.timer)
 			}
 		}
 	}
@@ -229,10 +298,21 @@
 			top: -110rpx;
 		}
 	}
-	.music-word{
+	.lyricroll{
+		font-size: 32rpx;
+		height: 280rpx;
+		line-height: 88rpx;
 		text-align: center;
-		color: #FFFFFF;
+		overflow: hidden;
+		color: #adadad;
+		.music-word{
+			transition: .5s;
+			.word-item{
+				height: 88rpx;
+			}
+		}
 	}
+	
 	.top-btn{
 		margin-top: 20rpx;
 		
@@ -300,6 +380,9 @@
 	.comment{
 		margin: 0 30rpx;
 		display: flex;
+		padding-bottom: 30rpx;
+		border-bottom: 1rpx solid #adadad;
+		margin-bottom: 30rpx;
 		.comment-left{
 			margin-right: 20rpx;
 			image{
@@ -336,5 +419,8 @@
 				}
 			}
 		}
+	}
+	.activeword{
+		color: #FFFFFF;
 	}
 </style>

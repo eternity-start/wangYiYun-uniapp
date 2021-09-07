@@ -60,6 +60,30 @@ export const songUrl = (data) => {
 		data
     })
 }
+// 热搜	http://localhost:3000/search/hot/detail
+export const hotSearch = (data) => {
+	return http.request({
+		url: '/search/hot/detail',
+		method: 'GET',
+		data
+	})
+}
+// 精准搜索 http://localhost:3000/search?keywords=少年
+export const search = (data) => {
+	return http.request({
+		url: '/search',
+		method: 'GET',
+		data
+	})
+}
+// 相关搜索 http://localhost:3000/search/suggest?keywords=少年&type=mobile
+export const simiSearch = (data) => {
+	return http.request({
+		url: '/search/suggest',
+		method: 'GET',
+		data
+	})
+}
 export default{
 	topList,
 	getDetailList,
@@ -67,5 +91,8 @@ export default{
 	simiSong,
 	commentMusic,
 	lyric,
-	songUrl
+	songUrl,
+	hotSearch,
+	simiSearch,
+	search
 }

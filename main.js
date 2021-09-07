@@ -1,5 +1,6 @@
 import Vue from 'vue'
 import App from './App'
+import store from './sotre/index.js'
 import api from 'common/api.js'
 Vue.config.productionTip = false
 Vue.prototype.$api = api
@@ -25,7 +26,9 @@ Vue.filter('handleNumber', value => {
 		return value.toFixed(2)+'亿';
 	}
 })
+
 const app = new Vue({
-    ...App
+    ...App,
+	store
 })
 app.$mount()
