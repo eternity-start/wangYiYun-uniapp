@@ -118,7 +118,7 @@
 					this.simiSearchList.length =0
 				}
 				
-			},
+			}, 
 			// 历史记录
 			historySh(value) {
 				this.putText = value
@@ -160,7 +160,7 @@
 			}
 		}
 	}
-</script>
+</script> 
 
 <style lang="less" scoped>
 	.search-box{
