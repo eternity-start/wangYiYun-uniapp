@@ -26,7 +26,7 @@
 					<view class="host">
 						<text>热搜榜</text>
 					</view>
-					<view class="host-item" v-for="(item, index) in hotSearchList" :key="index" @click="gotoSearch(item.searchWord)">
+					<view class="host-item" v-for="(item, index) in hotSearchList" :key="index" @click="gotoSearchid(item.searchWord)">
 						<view class="item-num">{{index+1}}</view>
 						<view class="item-detail">
 							<view class="detail-top">{{item.searchWord}}</view>
@@ -139,7 +139,7 @@
 					uni.setStorageSync('historySearch', JSON.stringify(this.historySearch))
 				})
 			},
-			gotoSearch(word) {
+			gotoSearchid(word) {
 				this.putText = word
 			},
 			gotoSearch(value) {
